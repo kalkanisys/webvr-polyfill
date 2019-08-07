@@ -93,6 +93,12 @@ WebVRPolyfill.prototype.populateDevices = function() {
     }
   }
 
+  // Set default display if no display is set.
+  if (!vrDisplay) {
+    vrDisplay = new VRDisplay();
+    this.connectDisplay(vrDisplay);
+  }
+
   // Uncomment to add positional tracking via webcam.
   //if (!this.isMobile() && window.WebVRConfig.ENABLE_DEPRECATED_API) {
   //  positionDevice = new WebcamPositionSensorVRDevice();
