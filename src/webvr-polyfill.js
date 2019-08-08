@@ -16,6 +16,7 @@
 var Util = require('./util.js');
 var CardboardVRDisplay = require('./cardboard-vr-display.js');
 var MouseKeyboardVRDisplay = require('./mouse-keyboard-vr-display.js');
+var NullVRDisplay = require('./null-vr-display.js');
 // Uncomment to add positional tracking via webcam.
 //var WebcamPositionSensorVRDevice = require('./webcam-position-sensor-vr-device.js');
 var VRDisplay = require('./base.js').VRDisplay;
@@ -93,17 +94,24 @@ WebVRPolyfill.prototype.populateDevices = function() {
     }
   }
 
-  // Set default display if no display is set.
-  if (!vrDisplay) {
-    vrDisplay = new VRDisplay();
-    this.connectDisplay(vrDisplay);
-  }
-
   // Uncomment to add positional tracking via webcam.
   //if (!this.isMobile() && window.WebVRConfig.ENABLE_DEPRECATED_API) {
   //  positionDevice = new WebcamPositionSensorVRDevice();
   //  this.devices.push(positionDevice);
   //}
+
+  // If No VR display is set and NULL CONTROL IS ENABLED then 
+  // add NullVR display
+  if (!vrDisplay && window.WebVRConfig.NULL_CONTROL) {
+    vrDisplay = new NullVRDisplay();
+    this.connectDisplay(vrDisplay);
+
+    // For backwards compatibility
+    if (window.WebVRConfig.ENABLE_DEPRECATED_API) {
+      this.devices.push(new VRDisplayHMDDevice(vrDisplay));
+      this.devices.push(new VRDisplayPositionSensorDevice(vrDisplay));
+    }
+  }
 
   this.devicesPopulated = true;
 };
